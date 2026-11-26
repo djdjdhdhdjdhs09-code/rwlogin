@@ -1,1 +1,75 @@
+# RWLogin - login/register system for offline-mode (cracked) servers.
+# Passwords are stored as BCrypt hashes in a SQLite database (WAL mode, synchronous=FULL),
+# so they survive restarts, reloads and crashes.
 
+database:
+  # File inside plugins/RWLogin/
+  file: "rwlogin.db"
+
+# Allowed player names (rejects weird names). Keep the default for normal Minecraft names.
+name-regex: "^[A-Za-z0-9_]{3,16}$"
+
+password:
+  min-length: 6
+  max-length: 32
+  # BCrypt cost (10 = fast, 12 = stronger but slower)
+  bcrypt-cost: 10
+  deny-same-as-name: true
+
+security:
+  # Wrong passwords in a row before the account is locked
+  max-attempts: 3
+  # From this many wrong tries, show the big red warning
+  warn-after-attempts: 2
+  # Lockout time in seconds (600 = 10 minutes)
+  lockout-seconds: 600
+  # Kick if the player has not logged in within this many seconds
+  login-timeout-seconds: 120
+  # 0 = ALWAYS ask for the password on every join.
+  # >0 = skip the password if the same IP rejoins within this many minutes.
+  auto-login-minutes: 0
+
+ui:
+  # true = password dialog screen (needs a Paper version with the Dialog API).
+  # If the dialog is unavailable the plugin falls back to /login and /register in chat.
+  use-dialog: true
+
+# All texts use MiniMessage. Placeholders: <player> <min> <max> <time> <attempts>
+messages:
+  title-login: "<gold>Enter your Password"
+  title-register: "<gold>Creating a Password"
+  body-login: "<gold>Welcome, <white><player></white>!\n<yellow>Please enter your password to log in to the server."
+  body-register: "<gold>Welcome, <white><player></white>!\n<yellow>You must <aqua>create a password</aqua> to log in to the server.\n<yellow>Please fill in the fields below to continue."
+  label-password: "<white>Password"
+  label-confirm: "<white>Confirmation"
+  btn-login: "<white>Log In"
+  btn-register: "<white>Create Account"
+  btn-logout: "<white>Logout"
+  wrong-password: "<red><bold>✘ Wrong password!</bold>"
+  warning: "<red><bold>⚠ WARNING!</bold> Only <attempts> attempt(s) left before a <time> lockout!"
+  locked-kick: "<red><bold>Too many wrong passwords!</bold>\n<gray>This account is locked for <red><time></red>."
+  locked-join: "<red><bold>Account locked!</bold>\n<gray>Too many wrong passwords. Try again in <red><time></red>."
+  invalid-name: "<red>Invalid player name."
+  login-success: "<green>✔ Logged in. Welcome!"
+  register-success: "<green>✔ Registered! Remember your password."
+  pw-short: "<red>Password too short (min <min>)."
+  pw-long: "<red>Password too long (max <max>)."
+  pw-mismatch: "<red>The two passwords do not match."
+  pw-name: "<red>Password cannot be your name."
+  already-registered: "<red>This account is already registered. Please login."
+  already-authed: "<yellow>You are already logged in."
+  not-authed: "<red>Login first."
+  usage-login: "<yellow>Usage: /login <password>"
+  usage-register: "<yellow>Usage: /register <password> <confirm>"
+  usage-change: "<yellow>Usage: /changepassword <old> <new>"
+  changed: "<green>✔ Password changed."
+  change-wrong: "<red>Old password is wrong."
+  timeout-kick: "<red>Login timed out."
+  logout-kick: "<gray>You logged out."
+  unregistered-kick: "<yellow>Your account was removed. Rejoin to register again."
+  unregistered: "<green>Account removed: <player>"
+  unregister-none: "<red>No account: <player>"
+  reloaded: "<green>RWLogin reloaded."
+  no-permission: "<red>No permission."
+  hint-login: "<red>Login required: type your password in the dialog or /login <password>"
+  hint-register: "<yellow>Register: use the dialog or /register <password> <password>"
