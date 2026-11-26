@@ -1,0 +1,25 @@
+name: RWLogin
+main: rw.login.RWLogin
+version: 1.0
+api-version: '1.21.11'
+description: "Premium login and register system with GUI dialog, BCrypt and lockout"
+commands:
+  login:
+    description: Log in to your account
+    usage: "/login <password>"
+    aliases: [l]
+  register:
+    description: Create your account
+    usage: "/register <password> <confirm>"
+    aliases: [reg]
+  changepassword:
+    description: Change your password
+    usage: "/changepassword <old> <new>"
+    aliases: [changepass, cp]
+  rwlogin:
+    description: RWLogin admin
+    usage: "/rwlogin <reload|unregister>"
+permissions:
+  rwlogin.admin:
+    description: Manage RWLogin
+    default: op
