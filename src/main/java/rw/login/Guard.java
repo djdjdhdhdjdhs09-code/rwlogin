@@ -49,11 +49,18 @@ final class Guard implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent e) {
         String name = e.getName();
-        if (!name.matches(pl.getConfig().getString("name-regex", "^[A-Za-z0-9_]{3,16}$"))) {
-            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, pl.msg("invalid-name"));
+                long ipWait = pl.ips.blockedFor(e.getAddress().getHostAddress());
+        if (ipWait > 0) {
+            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, pl.msg("ip-locked", pl.ph("time", pl.fmt(ipWait))));
             return;
         }
-        try {
+        Player online = pl.getServer().getPlayerExact(name);
+        if (online != null && online.getAddress() != null
+                && !online.getAddress().getAddress().getHostAddress().equals(e.getAddress().getHostAddress())) {
+            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                    pl.msg("already-online"));
+            return;
+        }
             String key = pl.key(name);
             Db.Account a = pl.db.query(() -> pl.db.find(key));
             long now = System.currentTimeMillis();
