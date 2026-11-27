@@ -49,7 +49,11 @@ final class Guard implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent e) {
         String name = e.getName();
-                long ipWait = pl.ips.blockedFor(e.getAddress().getHostAddress());
+        if (!name.matches(pl.getConfig().getString("name-regex", "^[A-Za-z0-9_]{3,16}$"))) {
+            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, pl.msg("invalid-name"));
+            return;
+        }
+        long ipWait = pl.ips.blockedFor(e.getAddress().getHostAddress());
         if (ipWait > 0) {
             e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, pl.msg("ip-locked", pl.ph("time", pl.fmt(ipWait))));
             return;
@@ -61,6 +65,7 @@ final class Guard implements Listener {
                     pl.msg("already-online"));
             return;
         }
+        try {
             String key = pl.key(name);
             Db.Account a = pl.db.query(() -> pl.db.find(key));
             long now = System.currentTimeMillis();
@@ -170,4 +175,4 @@ final class Guard implements Listener {
     public void onTarget(EntityTargetLivingEntityEvent e) {
         if (e.getTarget() != null) deny(e, e.getTarget());
     }
-    }
+}
