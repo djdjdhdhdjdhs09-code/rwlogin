@@ -28,7 +28,12 @@ security:
   # 0 = ALWAYS ask for the password on every join.
   # >0 = skip the password if the same IP rejoins within this many minutes.
   auto-login-minutes: 0
-
+  # One IP address making this many wrong passwords (on any accounts) gets blocked.
+  ip-max-attempts: 6
+  # How long that IP stays blocked, in seconds (900 = 15 minutes)
+  ip-lock-seconds: 900
+  # Wait this many milliseconds between password tries (stops fast guessing)
+  try-cooldown-ms: 1500
 ui:
   # true = password dialog screen (needs a Paper version with the Dialog API).
   # If the dialog is unavailable the plugin falls back to /login and /register in chat.
@@ -50,6 +55,9 @@ messages:
   locked-kick: "<red><bold>Too many wrong passwords!</bold>\n<gray>This account is locked for <red><time></red>."
   locked-join: "<red><bold>Account locked!</bold>\n<gray>Too many wrong passwords. Try again in <red><time></red>."
   invalid-name: "<red>Invalid player name."
+  already-online: "<red><bold>Access denied!</bold>\n<gray>This player is already online."
+  ip-locked: "<red><bold>Too many wrong passwords!</bold>\n<gray>Your connection is blocked for <red><time></red>."
+  too-fast: "<red>Slow down! Wait a moment before trying again."
   login-success: "<green>✔ Logged in. Welcome!"
   register-success: "<green>✔ Registered! Remember your password."
   pw-short: "<red>Password too short (min <min>)."
