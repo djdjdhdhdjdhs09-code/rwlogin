@@ -24,7 +24,8 @@ public final class RWLogin extends JavaPlugin {
     Auth auth;
     Reg reg;
     Ui ui;
-
+    final IpGuard ips = new IpGuard();
+    final Map<UUID, Long> lastTry = new ConcurrentHashMap<>();
     @Override
     public void onEnable() {
         saveDefaultConfig();
