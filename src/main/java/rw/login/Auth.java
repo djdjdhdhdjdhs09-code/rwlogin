@@ -49,6 +49,7 @@ final class Auth {
         pl.authed.remove(id);
         pl.joinAt.remove(id);
         registered.remove(id);
+        pl.lastTry.remove(id);
     }
 
     void login(Player p, String pw) {
@@ -59,6 +60,17 @@ final class Auth {
         UUID id = p.getUniqueId();
         String key = pl.key(p.getName());
         String ip = pl.ip(p);
+        long wait = pl.ips.blockedFor(ip);
+        if (wait > 0) {
+            p.kick(pl.msg("ip-locked", pl.ph("time", pl.fmt(wait))));
+            return;
+        }
+        long nowMs = System.currentTimeMillis();
+        Long prev = pl.lastTry.put(id, nowMs);
+        if (prev != null && nowMs - prev < pl.getConfig().getLong("security.try-cooldown-ms", 1500)) {
+            pl.ui.show(p, false, pl.msg("too-fast"));
+            return;
+        }
         int max = pl.getConfig().getInt("security.max-attempts", 3);
         int warn = pl.getConfig().getInt("security.warn-after-attempts", 2);
         long lock = pl.getConfig().getLong("security.lockout-seconds", 600);
@@ -89,6 +101,14 @@ final class Auth {
                 pl.sync(() -> pl.success(p, "login-success"));
                 return;
             }
+            boolean ipBlocked = pl.ips.fail(ip, pl.getConfig().getInt("security.ip-max-attempts", 6),
+                    pl.getConfig().getLong("security.ip-lock-seconds", 900));
+            if (ipBlocked) {
+                long w = pl.ips.blockedFor(ip);
+                pl.getLogger().warning("IP " + ip + " blocked for too many wrong passwords (last name: " + p.getName() + ")");
+                pl.sync(() -> p.kick(pl.msg("ip-locked", pl.ph("time", pl.fmt(w)))));
+                return;
+            }
             int f = a.fails() + 1;
             if (f >= max) {
                 pl.db.setFails(key, 0, now + lock * 1000L);
@@ -107,4 +127,4 @@ final class Auth {
             }
         });
     }
-                   }
+}
